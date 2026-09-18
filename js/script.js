@@ -14,23 +14,61 @@ function formatTime(seconds) {
         String(secs).padStart(2, '0');
 }
 
+// async function getsongs(folder) {
+//     // let a = await fetch(`/${folder}/`);
+//     // currfolder = folder;
+//     // let response = await a.text();
+//     // // console.log(response);
+//     // let div = document.createElement('div');
+
+//     // div.innerHTML = response;
+//     // let as = div.getElementsByTagName('a');
+//     // songs = []
+//     // for (let index = 0; index < as.length; index++) {
+//     //     const element = as[index];
+//     //     if (element.href.endsWith(".mp3")) {
+//     //         songs.push(element.href.split(`/${folder}/`)[1])
+//     //     }
+
+//     // }
+
+//     let a = await fetch("/songs.json");
+//     let data = await a.json();
+
+//     currfolder = `songs/${folder}`;
+
+//     songs = data[folder];
+
+
+//     //show all the song in the playlist
+//     let songUl = document.querySelector('.songlist').getElementsByTagName("ul")[0]
+//     songUl.innerHTML = " "
+//     for (const song of songs) {
+//         songUl.innerHTML = songUl.innerHTML + `<li>
+//                             <img class="invert" src="img/music.svg" alt="">
+//                             <div class="info">
+//                                 <div>${song.replaceAll("%20", " ")}</div>
+//                                 <div>Ashish</div>
+//                             </div>
+//                             <div class="playnow">
+
+//                                 <span>Play Now</span>
+//                                 <img class="invert" src="img/play.svg" alt="">
+//                             </div> </li>`;
+//     }
+
+//     //attach an eventListener to each song
+//     Array.from(document.querySelector('.songlist').getElementsByTagName("li")).forEach((e) => {
+//         e.addEventListener('click', (element) => {
+//             // console.log(e.querySelector(".info").firstElementChild.innerHTML);
+//             playMusic(e.querySelector(".info").firstElementChild.innerHTML.trim())
+            
+//         })
+//     })
+//     return songs;
+// }
+
 async function getsongs(folder) {
-    // let a = await fetch(`/${folder}/`);
-    // currfolder = folder;
-    // let response = await a.text();
-    // // console.log(response);
-    // let div = document.createElement('div');
-
-    // div.innerHTML = response;
-    // let as = div.getElementsByTagName('a');
-    // songs = []
-    // for (let index = 0; index < as.length; index++) {
-    //     const element = as[index];
-    //     if (element.href.endsWith(".mp3")) {
-    //         songs.push(element.href.split(`/${folder}/`)[1])
-    //     }
-
-    // }
 
     let a = await fetch("/songs.json");
     let data = await a.json();
@@ -39,32 +77,32 @@ async function getsongs(folder) {
 
     songs = data[folder];
 
+    let songUl = document.querySelector('.songlist').getElementsByTagName("ul")[0];
 
-    //show all the song in the playlist
-    let songUl = document.querySelector('.songlist').getElementsByTagName("ul")[0]
-    songUl.innerHTML = " "
+    songUl.innerHTML = "";
+
     for (const song of songs) {
-        songUl.innerHTML = songUl.innerHTML + `<li>
-                            <img class="invert" src="img/music.svg" alt="">
-                            <div class="info">
-                                <div>${song.replaceAll("%20", " ")}</div>
-                                <div>Ashish</div>
-                            </div>
-                            <div class="playnow">
-
-                                <span>Play Now</span>
-                                <img class="invert" src="img/play.svg" alt="">
-                            </div> </li>`;
+        songUl.innerHTML += `<li>
+            <img class="invert" src="img/music.svg" alt="">
+            <div class="info">
+                <div>${song}</div>
+                <div>Ashish</div>
+            </div>
+            <div class="playnow">
+                <span>Play Now</span>
+                <img class="invert" src="img/play.svg" alt="">
+            </div>
+        </li>`;
     }
 
-    //attach an eventListener to each song
-    Array.from(document.querySelector('.songlist').getElementsByTagName("li")).forEach((e) => {
-        e.addEventListener('click', (element) => {
-            // console.log(e.querySelector(".info").firstElementChild.innerHTML);
-            playMusic(e.querySelector(".info").firstElementChild.innerHTML.trim())
-            
-        })
-    })
+    Array.from(songUl.getElementsByTagName("li")).forEach((e) => {
+        e.addEventListener('click', () => {
+            playMusic(
+                e.querySelector(".info").firstElementChild.innerHTML.trim()
+            );
+        });
+    });
+
     return songs;
 }
 
