@@ -15,22 +15,30 @@ function formatTime(seconds) {
 }
 
 async function getsongs(folder) {
-    let a = await fetch(`/${folder}/`);
-    currfolder = folder;
-    let response = await a.text();
-    // console.log(response);
-    let div = document.createElement('div');
+    // let a = await fetch(`/${folder}/`);
+    // currfolder = folder;
+    // let response = await a.text();
+    // // console.log(response);
+    // let div = document.createElement('div');
 
-    div.innerHTML = response;
-    let as = div.getElementsByTagName('a');
-    songs = []
-    for (let index = 0; index < as.length; index++) {
-        const element = as[index];
-        if (element.href.endsWith(".mp3")) {
-            songs.push(element.href.split(`/${folder}/`)[1])
-        }
+    // div.innerHTML = response;
+    // let as = div.getElementsByTagName('a');
+    // songs = []
+    // for (let index = 0; index < as.length; index++) {
+    //     const element = as[index];
+    //     if (element.href.endsWith(".mp3")) {
+    //         songs.push(element.href.split(`/${folder}/`)[1])
+    //     }
 
-    }
+    // }
+
+    let a = await fetch("/songs.json");
+    let data = await a.json();
+
+    currfolder = `songs/${folder}`;
+
+    songs = data[folder];
+
 
     //show all the song in the playlist
     let songUl = document.querySelector('.songlist').getElementsByTagName("ul")[0]
@@ -62,7 +70,7 @@ async function getsongs(folder) {
 
 const playMusic = (track, pause = false) => {
     // let audio = new Audio('/songs/' + track);
-    currentSong.src = `/${currfolder}/` + track;
+    currentSong.src = `/${currfolder}/` + encodeURIComponent(track);
     if (!pause) {
         currentSong.play();
         play.src = 'img/pause.svg';
@@ -73,7 +81,8 @@ const playMusic = (track, pause = false) => {
 }
 
 async function displayAlbum() {
-    let a = await fetch(`/songs/`);
+    // let a = await fetch(`/songs/`);
+    let a = await fetch(`/songs.json`);
     let response = await a.text();
     // console.log(response);
     let div = document.createElement('div');
@@ -113,7 +122,8 @@ async function displayAlbum() {
         Array.from(document.getElementsByClassName("card")).forEach((e) => {
             e.addEventListener('click', async item => {
                 // console.log(item,item.currentTarget.dataset.folder)
-                songs = await getsongs(`songs/${item.currentTarget.dataset.folder}`);
+                // songs = await getsongs(`songs/${item.currentTarget.dataset.folder}`);
+                songs = await getsongs(item.currentTarget.dataset.folder);
                 playMusic(songs[0])
             })
         })
