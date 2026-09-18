@@ -63,7 +63,6 @@ async function getsongs(folder) {
 }
 
 const playMusic = (track, pause = false) => {
-    // let audio = new Audio('/songs/' + track);
     currentSong.src = `/${currfolder}/` + encodeURIComponent(track);
     if (!pause) {
         currentSong.play();
@@ -119,16 +118,11 @@ async function displayAlbum() {
 
 async function main() {
 
-
-    //list of song
     await getsongs('first');
     playMusic(songs[0], true);
-    // console.log(songs);
 
-    //Display all album on page
     displayAlbum();
 
-    //attach eventlistener on play,prev , next
     play.addEventListener('click', () => {
         if (currentSong.paused) {
             currentSong.play();
@@ -139,75 +133,75 @@ async function main() {
         }
     })
 
-    //listen for timeupdate event
     currentSong.addEventListener('timeupdate', () => {
-        // console.log(currentSong.currentTime,currentSong.duration)
         document.querySelector(".songtime").innerHTML = `${formatTime(currentSong.currentTime)} / ${formatTime(currentSong.duration)}`
-
-        //circle move
         document.querySelector(".circle").style.left = (currentSong.currentTime / currentSong.duration) * 100 + "%";
     })
 
-    //Add eventlistener to seekbar
     document.querySelector('.seekbar').addEventListener('click', (e) => {
         let percent = (e.offsetX / e.target.getBoundingClientRect().width) * 100;
         document.querySelector('.circle').style.left = percent + "%";
-
         currentSong.currentTime = (currentSong.duration * percent) / 100;
-
     })
 
-    //Add eventListener on hamburger
     document.querySelector('.hamburger').addEventListener('click', () => {
         document.querySelector('.left').style.left = '0';
     })
 
-    //Add eventListener on close
     document.querySelector('.close').addEventListener('click', () => {
         document.querySelector('.left').style.left = '-120%';
     })
 
-    //Add eventListener on prev
     previous.addEventListener('click', () => {
         let currentTrack = decodeURIComponent(currentSong.src.split('/').slice(-1)[0]);
         let index = songs.indexOf(currentTrack);
         if (index - 1 >= 0) {
             playMusic(songs[index - 1]);
         }
-
     })
 
-    //Add eventListener on next
     next.addEventListener('click', () => {
         let currentTrack = decodeURIComponent(currentSong.src.split('/').slice(-1)[0]);
         let index = songs.indexOf(currentTrack);
-
         if (index + 1 < songs.length) {
             playMusic(songs[index + 1]);
-
         }
     })
 
-    //Add event on volume
-    document.querySelector('.range').getElementsByTagName('input')[0].addEventListener('change', (e) => {
-        // console.log(e.target.value);
-        currentSong.volume = (e.target.value) / 100;
-    })
+    // Volume slider and mute button
+    const volumeInput = document.querySelector('.range input[type="range"]');
+    const volumeIcon = document.querySelector('.volume > img');
+    let lastVolume = 0.1;
 
-   //add event on volume to mute
-   document.querySelector('.volume> img').addEventListener('click',e=>{
-        // console.log(e.target.src);
-        if(e.target.src.includes('volume.svg')){
-            e.target.src = e.target.src.replace('volume.svg', 'mute.svg');
-            document.querySelector('.range').getElementsByTagName('input')[0].value = 0;
-            currentSong.volume = 0;
-        }else{
-            e.target.src = e.target.src.replace('mute.svg','volume.svg');
-            document.querySelector('.range').getElementsByTagName('input')[0].value = 10;
-            currentSong.volume = .10;
+    currentSong.volume = lastVolume;
+    volumeInput.value = lastVolume * 100;
+
+    volumeInput.addEventListener('input', (e) => {
+        const volume = Number(e.target.value) / 100;
+        currentSong.volume = volume;
+        currentSong.muted = volume === 0;
+
+        if (volume > 0) {
+            lastVolume = volume;
+            volumeIcon.src = 'img/volume.svg';
+        } else {
+            volumeIcon.src = 'img/mute.svg';
         }
-        
-   })
+    });
+
+    volumeIcon.addEventListener('click', () => {
+        if (currentSong.muted || currentSong.volume === 0) {
+            currentSong.muted = false;
+            currentSong.volume = lastVolume || 0.1;
+            volumeInput.value = currentSong.volume * 100;
+            volumeIcon.src = 'img/volume.svg';
+        } else {
+            lastVolume = currentSong.volume;
+            currentSong.muted = true;
+            volumeInput.value = 0;
+            volumeIcon.src = 'img/mute.svg';
+        }
+    });
 }
 
 main();
